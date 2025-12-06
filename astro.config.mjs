@@ -5,7 +5,12 @@ import starlightLinksValidator from "starlight-links-validator";
 
 // https://astro.build/config
 export default defineConfig({
-    site: "https://equibop.equicord.org",
+    site: "https://equibop.org",
+    vite: {
+        server: {
+            allowedHosts: ['equibop.org'],
+        },
+    },
 
     integrations: [
         starlight({
@@ -23,7 +28,7 @@ export default defineConfig({
             ],
 
             editLink: {
-                baseUrl: "https://github.com/Equicord/equibop.equicord.org/edit/main/"
+                baseUrl: "https://github.com/Equicord/equibop.org/edit/main/"
             },
 
             lastUpdated: true,
