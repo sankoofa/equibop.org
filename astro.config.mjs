@@ -10,6 +10,9 @@ export default defineConfig({
         server: {
             allowedHosts: ['equibop.org'],
         },
+        preview: {
+            allowedHosts: ['equibop.org'],
+        },
     },
 
     integrations: [
