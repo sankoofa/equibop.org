@@ -5,86 +5,121 @@ sidebar:
     order: 1
 ---
 
-## Equibop Arguments & Customization
+## Applying custom arguments
 
-If you need to customize how Equibop runs, you can pass arguments directly via the terminal or through the application settings at `Settings > Equibop Settings > Arguments > Configure`.
+Any of the flags listed below can be applied using one of these three methods:
 
-### **Wayland Support**
+1. **In‑App Settings:** `Settings > Equibop Settings > Arguments > Configure`.
+2. **Desktop entry:** Edit the `Exec` line in `/usr/share/applications/equibop.desktop` (or your local equivalent).
+3. **Config file:** Add flags to `${XDG_CONFIG_HOME}/equibop-flags.conf` (see “The Flags File” section).
 
-Equibop runs as an X11 application by default. You can override this behaviour using the following flag:
+## Wayland support
+
+Equibop runs as an X11 application by default. You can opt into Wayland in several ways depending on how you run Equibop. To make this permanent, see [Making Command line flags permanent](#making-command-line-flags-permanent).
+
+### Shortcut
 
 ```bash
 --wayland
 ```
 
-This is a shortcut flag that forces the application to use the **Ozone Wayland** platform. It automatically enables:
+This is a convenient shortcut that will enable native Wayland behavior and automatically enable features such as:
 
 * `WaylandWindowDecorations`
-* `VaapiVideoDecodeLinuxGL` (Hardware acceleration)
+* `VaapiVideoDecodeLinuxGL` (hardware acceleration)
 
-> **Note:** You can still use the manual string:
-> `--enable-features=UseOzonePlatform --ozone-platform=wayland`
+> **Manual equivalent:**
+>
+> ```bash
+> --enable-features=UseOzonePlatform --ozone-platform=wayland
+> ```
 
-#### **For Flatpak Users**
+### Ozone automatic hint (alternate)
 
-If you are using the Flatpak version, you can force Wayland by opening [Flatseal](https://flathub.org/en/apps/com.github.tchx84.Flatseal) and denying the `X11 windowing system` permission for Equibop.
+If you prefer the Ozone auto hint instead of forcing Wayland, use:
 
-### **Security & Performance**
+```bash
+--ozone-platform-hint=auto
+```
+
+This is useful when you want Equibop to prefer Wayland when available while still falling back to X11.
+
+### Flatpak users
+
+If you installed Equibop via Flatpak, open **[Flatseal](https://flathub.org/en/apps/com.github.tchx84.Flatseal)** and **deny** the **"X11 windowing system"** permission for Equibop. This ensures the Flatpak targets Wayland instead of X11.
+
+## GNOME tray icon
+
+To enable the tray icon on GNOME, install the [AppIndicator and KStatusNotifierItem Support extension](https://extensions.gnome.org/extension/615/appindicator-support/)
+
+## Sandbox control
 
 ```bash
 --no-sandbox
 ```
 
-Disables the Chromium sandbox. This is generally discouraged for security reasons but is often required when the application is executed as **root**.
+Disables the Chromium sandbox. This is **discouraged** for regular use because it weakens security. Only use it if you understand the risks or if you must run the application as **root**.
+
+## GPU selection
 
 ```bash
 --force_high_performance_gpu
 ```
 
-Instructs the graphics engine to ignore integrated graphics and prioritize the discrete (high-performance) GPU.
+Forces the engine to prefer the discrete GPU (if available) over integrated graphics.
 
-### **Middle Click Auto Scroll**
+## Middle-click auto scroll
+
+Enable middle-click autoscroll with:
 
 ```bash
 --enable-blink-features=MiddleClickAutoscroll
 ```
 
-This flag enables the auto-scroll feature when clicking the middle mouse button.
+By default this conflicts with the common Linux behavior where middle-click pastes the primary selection. Fixes by environment:
 
-* **Note:** This will conflict with the default Linux "middle click to paste" behavior.
-* **X11:** Install and run [XMousePasteBlock](https://github.com/milaq/XMousePasteBlock).
-* **Wayland/GNOME:** You can disable the primary selection paste in **Gnome Tweaks**.
-
----
-
-## GNOME Tray Icon
-
-To enable the tray icon on GNOME, install the [AppIndicator and KStatusNotifierItem Support extension](https://extensions.gnome.org/extension/615/appindicator-support/).
+-   If you are running Equibop in X11 (default), install and run [XMousePasteBlock](https://github.com/milaq/XMousePasteBlock).
+-   If you are running Equibop in Wayland, you might be able to disable it in your Desktop settings.
+    On GNOME, you can disable it in [Gnome Tweaks](https://wiki.gnome.org/Apps/Tweaks).
 
 ---
 
-## Making Flags Permanent
+## Making command-line flags permanent
 
-You can make these arguments persistent using two different methods:
+You can persist flags either by editing the `.desktop` file or by creating the flags file described below.
 
-### Method 1: Persistent Configuration File (Recommended)
-
-The launcher supports reading arguments from a specific configuration file, which survives updates.
-
-* **File Path:** `${XDG_CONFIG_HOME}/equibop-flags.conf`
-* **Rules:** Lines starting with `#` are ignored; empty lines are ignored.
-* **Effect:** All valid entries are automatically appended to the execution command.
-
-### Method 2: Editing the .desktop File
-
-Locate Equibop's `.desktop` file:
+### Find the desktop file
 
 ```sh
 locate -ib equibop.desktop
 ```
 
-Usually found in `/usr/share/applications/equibop.desktop`. Open it with a text editor and add your flags to the `Exec` line, after the binary path and before the `%U`:
+Common location: `/usr/share/applications/equibop.desktop` (but your distribution may place it elsewhere).
+
+### Edit the Exec line
+
+Open the `.desktop` file with your preferred editor and append the flags after the binary and before `%U` (if present):
 
 ```text
-Exec=/usr/bin/equibop --wayland --force_high_performance_gpu %U
+Exec=/usr/bin/equibop --ozone-platform-hint=auto %U
+```
+
+## Configuration details
+
+Create `${XDG_CONFIG_HOME}/equibop-flags.conf` to keep persistent flags across updates and desktop entry resets.
+
+* One flag per line or multiple flags on a single line (shell style) are both acceptable.
+* Lines starting with `#` are ignored (useful for comments).
+
+Example `equibop-flags.conf`:
+
+```text
+# Make Equibop prefer Wayland when available
+--wayland
+
+# Prefer discrete GPU
+--force_high_performance_gpu
+
+# Enable middle-click autoscroll
+--enable-blink-features=MiddleClickAutoscroll
 ```
