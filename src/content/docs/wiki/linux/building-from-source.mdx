@@ -29,24 +29,6 @@ Equibop can be built or run in several ways:
 * **Build Linux Pacman package:** `bun package --linux pacman`
 * **Package to a directory only:** `bun package:dir`
 
-### Development Mode
-
-You can build a Development Build of Equicord by appending `--dev` to the build command. This gives you access to development tools like **PatchHelper**.
-
-```sh
-pnpm build --dev
-```
-
-### Automatic Rebuilding (Watch Mode)
-
-Whenever you make changes to the source code, you must rebuild to apply them. To avoid doing this manually, use the `--watch` flag to automatically rebuild whenever a file is saved:
-
-```sh
-pnpm build --watch
-```
-
----
-
 ## Building LibVesktop from Source
 
 **LibVesktop** is a small C++ helper library that Equibop uses on Linux to emit D-Bus events. By default, prebuilt binaries for **x64** and **arm64** are used.
